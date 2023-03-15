@@ -1,11 +1,13 @@
 from flask_mysqldb import MySQL
+from config import db
 
 class Connect:
 
     def __init__(self, app):
-        app.config["MYSQL_USER"] = "usuario"
-        app.config["MYSQL_PASSWORD"] = "senha"
-        app.config["MYSQL_DB"] = "saude"
+        app.config["MYSQL_HOST"] = db.DB_HOST
+        app.config["MYSQL_USER"] = db.DB_USER
+        app.config["MYSQL_PASSWORD"] = db.DB_PASSWORD
+        app.config["MYSQL_DB"] = db.DB_NAME
         # Extra configs, optional:
         app.config["MYSQL_CURSORCLASS"] = "DictCursor"
         app.config["MYSQL_CUSTOM_OPTIONS"] = {"ssl": {"ca": "/path/to/ca-file"}}  # https://mysqlclient.readthedocs.io/user_guide.html#functions-and-attributes
