@@ -15,14 +15,23 @@ class Connect:
         self.mysql = MySQL(app)
 
 
-    def select(self):
+    ''' 
+        Return all databases in this connection
+    '''
+    def databases(self):
         cur = self.mysql.connection.cursor()
-        cur.execute("""SELECT * FROM users limit 10""")
-        rv = cur.fetchall()
-        return str(rv)
+        cur.execute("""show databases""")
+        dbs = cur.fetchall()
+        return str(dbs)
 
-    def selectTable(self, table):
-        cur = self.mysql.connection.cursor()
-        cur.execute("SELECT * FROM " + table + " limit 10")
-        rv = cur.fetchall()
-        return str(rv)
+    # def select(self):
+    #     cur = self.mysql.connection.cursor()
+    #     cur.execute("""SELECT * FROM users limit 10""")
+    #     rv = cur.fetchall()
+    #     return str(rv)
+
+    # def selectTable(self, table):
+    #     cur = self.mysql.connection.cursor()
+    #     cur.execute("SELECT * FROM " + table + " limit 10")
+    #     rv = cur.fetchall()
+    #     return str(rv)
