@@ -4,6 +4,7 @@
 
 from flask_mysqldb import MySQL
 from config import db
+import json
 
 class Connect:
 
@@ -42,7 +43,7 @@ class Connect:
         cur = self.mysql.connection.cursor()
         cur.execute("desc  {}.{}".format(database, table))
         describe = cur.fetchall()
-        return describe
+        return list(describe)
 
     
     ## Return the number of register on specific table
@@ -70,7 +71,7 @@ class Connect:
                     table_name = table['Tables_in_{}'.format(database_name)]
                     descriptions = self.descTable(database_name, table_name)
                     count = self.countRegisters(database_name, table_name)
-                    allDatas[database_name]['tables'] = {
+                    allDatas[database_name]['tables'][table_name] = {
                         'table_name': table_name,
                         'count': count,
                         'describe': descriptions
