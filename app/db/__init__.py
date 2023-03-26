@@ -22,12 +22,13 @@ class Connect:
 
 
      
-    #   Return all databases in this connection    
+    #   Return all databases    
     def databases(self):
         cur = self.mysql.connection.cursor()
         cur.execute("""show databases""")
         dbs = cur.fetchall()
         return dbs
+
 
 
     ##  Return a list witch all tables in a database
@@ -38,7 +39,8 @@ class Connect:
         return tables
 
 
-    ## Return a describe of the a table
+
+    ## Return a list formated with describe of the table
     def descTable(self, database, table):
         cur = self.mysql.connection.cursor()
         cur.execute("desc  {}.{}".format(database, table))
@@ -46,7 +48,8 @@ class Connect:
         return list(describe)
 
     
-    ## Return the number of register on specific table
+
+    ## Return the number of register in specific table
     def countRegisters(self, database, table):
         cur = self.mysql.connection.cursor()
         cur.execute("select count(*) from  {}.{}".format(database, table))
@@ -54,40 +57,39 @@ class Connect:
         return qtd[0]['count(*)']
 
 
-    ##  Return a Json with descriptions of all tables in all databases.
+
+    ##  Return the informations of all tables in a database, 
+    ##  including number of retisters, name of the table structure description.
+    def descDatabase(self, database):        
+        allDatas = {}        
+        tables = self.tables( database )
+        allDatas = {
+                'db_name': database,
+                'tables': {}
+            }
+        
+        for table in tables:
+            table_name = table['Tables_in_{}'.format(database)]
+            descriptions = self.descTable(database, table_name)
+            count = self.countRegisters(database, table_name)
+            allDatas['tables'][table_name] = {
+                'table_name': table_name,
+                'count': count,
+                'describe': descriptions
+            }
+        return allDatas
+
+
+
+    ##  Return one dictionary with all databases, 
+    ##  for each database, they have a dictionary with 
+    ##  descriptions of each table.
     def descAllDatabases(self):
         databases = self.databases()
         allDatas = {}
         for datab in databases:
-            if datab['Database'] not in db.DB_EXCLUDE:
-                database_name = datab['Database']
-                tables = self.tables( database_name )
-                allDatas[database_name] = {
-                        'db_name': database_name,
-                        'tables': {}
-                    }
-                
-                for table in tables:
-                    table_name = table['Tables_in_{}'.format(database_name)]
-                    descriptions = self.descTable(database_name, table_name)
-                    count = self.countRegisters(database_name, table_name)
-                    allDatas[database_name]['tables'][table_name] = {
-                        'table_name': table_name,
-                        'count': count,
-                        'describe': descriptions
-                    }                    
+            db_name = datab['Database']
+            if db_name not in db.DB_EXCLUDE:
+                allDatas[ db_name ] = self.descDatabase(db_name)
         return allDatas
         
-
-
-    # def select(self):
-    #     cur = self.mysql.connection.cursor()
-    #     cur.execute("""SELECT * FROM users limit 10""")
-    #     rv = cur.fetchall()
-    #     return str(rv)
-
-    # def selectTable(self, table):
-    #     cur = self.mysql.connection.cursor()
-    #     cur.execute("SELECT * FROM " + table + " limit 10")
-    #     rv = cur.fetchall()
-    #     return str(rv)
