@@ -1,8 +1,13 @@
+###
+### @author Fagner Jefferson 
+### fagnerfjas@gmail.com
+
 from flask_mysqldb import MySQL
 from config import db
 
 class Connect:
 
+    ### Initial configuration for conect on database
     def __init__(self, app):
         app.config["MYSQL_HOST"] = db.DB_HOST
         app.config["MYSQL_USER"] = db.DB_USER
@@ -40,13 +45,15 @@ class Connect:
         return describe
 
     
+    ## Return the number of register on specific table
     def countRegisters(self, database, table):
         cur = self.mysql.connection.cursor()
         cur.execute("select count(*) from  {}.{}".format(database, table))
         qtd = cur.fetchall()
-        return qtd
+        return qtd[0]['count(*)']
 
 
+    ##  Return a Json with descriptions of all tables in all databases.
     def descAllDatabases(self):
         databases = self.databases()
         allDatas = {}
@@ -62,15 +69,13 @@ class Connect:
                 for table in tables:
                     table_name = table['Tables_in_{}'.format(database_name)]
                     descriptions = self.descTable(database_name, table_name)
-                    allDatas[database_name]['tables']['tables'] = {
+                    count = self.countRegisters(database_name, table_name)
+                    allDatas[database_name]['tables'] = {
                         'table_name': table_name,
-                        'describe': descriptions,
-                        'count': self.countRegisters(database_name, table_name)
-                    }
-                    
-
-
-        return str(allDatas)
+                        'count': count,
+                        'describe': descriptions
+                    }                    
+        return allDatas
         
 
 

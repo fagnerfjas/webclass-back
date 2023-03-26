@@ -4,19 +4,20 @@ from app.db import Connect
 
 database = Connect(app)
 
+#   Initial page
 @app.route('/')
 @app.route('/index')
 def index():    
     return render_template('index.html')
 
 
+#   Return a JSON with all databases
 @app.route('/databases')
 def databases():
-    return database.databases()
+    return str(database.databases())
 
-
-@app.route('/desc_all_tables', methods=['GET'])
+#   Return a JSON with all databases, respective tables and yours descriptions fields
+@app.route('/desc_databases', methods=['GET'])
 def desc_all_tables():
-    return database.descAllDatabases()
-    #return database.tables( request.args.get('database') )
+    return str(database.descAllDatabases())    
 
